@@ -112,25 +112,32 @@ public class DustEngine {
 			}
 			DustEngine engine = new DustEngine(options);
 			String[] files = cmdLine.getArgs();
-			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-			StringWriter sw = new StringWriter();
-			char[] buffer = new char[1024];
-			int n = 0;
-			while (-1 != (n = in.read(buffer))) {
-				sw.write(buffer, 0, n);
-			}
-			String src = sw.toString();
-			if (!src.isEmpty()) {
+
+            String src = null;
+            if (files == null  || files.length == 0) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+                StringWriter sw = new StringWriter();
+                char[] buffer = new char[1024];
+                int n = 0;
+                while (-1 != (n = in.read(buffer))) {
+                    sw.write(buffer, 0, n);
+                }
+                src = sw.toString();
+            }
+
+			if (src != null  && !src.isEmpty()) {
 				System.out.println(engine.compile(src, "test"));
-				System.exit(0);
+                return;
 			}
+
 			if (files.length == 1) {
 				System.out.println(engine.compile(new File(files[0])));
-				System.exit(0);
+                return;
 			}
+
 			if (files.length == 2) {
 				engine.compile(new File(files[0]), new File(files[1]));
-				System.exit(0);
+                return;
 			}
 			
 		} catch (IOException ioe) {
@@ -138,10 +145,11 @@ public class DustEngine {
 		} catch (ParseException pe) {
 			System.err.println("Error parsing arguments.");
 		}
-		String[] paths = DustEngine.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().split(File.separator);
+
+
 		HelpFormatter formatter = new HelpFormatter();
-		formatter.printHelp("java -jar " + paths[paths.length - 1] + " input [output] [options]", cmdOptions);
+		formatter.printHelp("java -jar dust-engine.jar input [output] [options]", cmdOptions);
 		System.exit(1);
 	}
-	
+
 }
